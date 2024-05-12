@@ -1,0 +1,97 @@
+#!/bin/bash
+
+# Predefined PIN (replace with a more secure method)
+PIN="1234"
+
+# Initial balance
+BALANCE=1000
+
+# Array to store transaction history
+declare -a TRANSACTION_HISTORY
+
+# Function to display account balance
+function display_balance() {
+    echo "Your current balance is $BALANCE"
+}
+
+# Function to withdraw money
+function withdraw() {
+    echo "Enter amount to withdraw:"
+    read amount
+    if ! [[ $amount =~ ^[0-9]+$ ]]; then
+        echo "Invalid input. Please enter a valid amount."
+        return
+    fi
+    if (( amount > BALANCE )); then
+        echo "Insufficient balance!"
+    else
+        BALANCE=$((BALANCE - amount))
+        echo "Withdrawal successful. New balance is $BALANCE"
+        TRANSACTION_HISTORY+=("Withdrawal: -$amount")
+    fi
+}
+
+# Function to deposit money
+function deposit() {
+    echo "Enter amount to deposit:"
+    read amount
+    if ! [[ $amount =~ ^[0-9]+$ ]]; then
+        echo "Invalid input. Please enter a valid amount."
+        return
+    fi
+    BALANCE=$((BALANCE + amount))
+    echo "Deposit successful. New balance is $BALANCE"
+    TRANSACTION_HISTORY+=("Deposit: +$amount")
+}
+
+# Function to change PIN
+function change_pin() {
+    echo "Enter new PIN:"
+    read new_pin
+    PIN="$new_pin"
+    echo "PIN changed successfully."
+}
+
+# Function to display transaction history
+function display_transaction_history() {
+    echo "Transaction History:"
+    for transaction in "${TRANSACTION_HISTORY[@]}"; do
+        echo "$transaction"
+    done
+}
+
+# Main function
+function main() {
+    echo "Welcome to the ATM"
+    echo "Please enter your PIN:"
+    read entered_pin
+
+    if [ "$entered_pin" != "$PIN" ]; then
+        echo "Invalid PIN. Exiting..."
+        exit 1
+    fi
+
+    while true; do
+        echo "Options:"
+        echo "1. Balance Inquiry"
+        echo "2. Withdraw"
+        echo "3. Deposit"
+        echo "4. Change PIN"
+        echo "5. Transaction History"
+        echo "6. Exit"
+        read option
+
+        case $option in
+            1) display_balance ;;
+            2) withdraw ;;
+            3) deposit ;;
+            4) change_pin ;;
+            5) display_transaction_history ;;
+            6) echo "Thank you for using the ATM. Goodbye!"; exit 0 ;;
+            *) echo "Invalid option";;
+        esac
+    done
+}
+
+# Start the program
+main
